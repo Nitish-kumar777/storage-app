@@ -80,36 +80,3 @@ export async function GET(request, { params }) {
     )
   }
 }
-
-export async function DELETE(request, { params }) {
-  try {
-    await dbConnect()
-    const userId = params.userId
-    const { fileId, fileType } = await request.json()
-
-    if (!userId || !fileId) {
-      return NextResponse.json(
-        { success: false, error: 'Missing required fields' },
-        { status: 400 }
-      )
-    }
-
-    if (fileType === 'cloudinary') {
-      await cloudinary.uploader.destroy(fileId)
-    } else {
-      await File.findOneAndDelete({ _id: fileId, userId })
-    }
-
-    return NextResponse.json({
-      success: true,
-      message: 'File deleted successfully'
-    })
-
-  } catch (error) {
-    console.error('Error deleting file:', error)
-    return NextResponse.json(
-      { success: false, error: error.message },
-      { status: 500 }
-    )
-  }
-}
